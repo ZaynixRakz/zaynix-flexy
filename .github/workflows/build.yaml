@@ -29,7 +29,7 @@ jobs:
           
           # Membuat file manifes dasar aplikasi
           mkdir -p bin/res/layout
-          echo '<manifest xmlns:android="http://android.com" package="com.zaynix.flexy"><uses-permission android:name="android.permission.INTERNET"/><application android:label="Zaynix Flexy"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>' > bin/AndroidManifest.xml
+          echo '<manifest xmlns:android="http:android.com" package="com.zaynix.flexy"><uses-permission android:name="android.permission.INTERNET"/><application android:label="Zaynix Flexy"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>' > bin/AndroidManifest.xml
           
           # Memaketkan struktur aset aplikasi
           $ANDROID_HOME/build-tools/34.0.0/aapt package -f -M bin/AndroidManifest.xml -I $ANDROID_HOME/platforms/android-34/android.jar -F bin/ZaynixFlexy-unaligned.apk bin/
