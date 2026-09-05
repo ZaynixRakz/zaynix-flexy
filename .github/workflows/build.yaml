@@ -17,12 +17,15 @@ jobs:
       - name: Setup Android SDK Modern
         uses: android-actions/setup-android@v3
 
-      - name: Kompilasi Menjadi APK Android 15
+      - name: Kompilasi Menjadi APK Android 10 Ke Atas
         run: |
           mkdir -p bin/classes/com/zaynix/flexy
           
-          # PERBAIKAN: Menggunakan parameter -Xbootclasspath agar cocok dengan Java 17
-          javac -d bin/classes -Xbootclasspath/p:$ANDROID_HOME/platforms/android-34/android.jar MainActivity.java
+          # SOLUSI FIX: Mengunduh android.jar secara terpisah agar tidak bentrok dengan modul internal Java 17
+          cp $ANDROID_HOME/platforms/android-34/android.jar .
+          
+          # Melakukan kompilasi bersih menggunakan classpath eksternal yang aman untuk Java 17
+          javac -cp android.jar -d bin/classes MainActivity.java
           
           # Mengubah kelas Java menjadi format Android Dex
           $ANDROID_HOME/build-tools/34.0.0/dx --dex --output=bin/classes.dex bin/classes
@@ -38,7 +41,7 @@ jobs:
           cd bin
           zip -u ZaynixFlexy-unaligned.apk classes.dex
           
-          # Membuat sertifikat tanda tangan keamanan agar bisa dipasang di Android 15
+          # Membuat sertifikat tanda tangan keamanan resmi untuk Android 10 ke atas
           keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks debug.keystore --ks-pass pass:android --out ZaynixFlexy.apk ZaynixFlexy-unaligned.apk
 
