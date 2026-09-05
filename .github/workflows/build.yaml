@@ -20,17 +20,25 @@ jobs:
       - name: Kompilasi Menjadi APK Android 15
         run: |
           mkdir -p bin/classes/com/zaynix/flexy
-          javac -d bin/classes -bootclasspath $ANDROID_HOME/platforms/android-34/android.jar MainActivity.java
+          
+          # PERBAIKAN: Menggunakan parameter -Xbootclasspath agar cocok dengan Java 17
+          javac -d bin/classes -Xbootclasspath/p:$ANDROID_HOME/platforms/android-34/android.jar MainActivity.java
+          
+          # Mengubah kelas Java menjadi format Android Dex
           $ANDROID_HOME/build-tools/34.0.0/dx --dex --output=bin/classes.dex bin/classes
           
+          # Membuat file manifes dasar aplikasi
           mkdir -p bin/res/layout
           echo '<manifest xmlns:android="http://android.com" package="com.zaynix.flexy"><uses-permission android:name="android.permission.INTERNET"/><application android:label="Zaynix Flexy"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>' > bin/AndroidManifest.xml
           
+          # Memaketkan struktur aset aplikasi
           $ANDROID_HOME/build-tools/34.0.0/aapt package -f -M bin/AndroidManifest.xml -I $ANDROID_HOME/platforms/android-34/android.jar -F bin/ZaynixFlexy-unaligned.apk bin/
           
+          # Memasukkan file dex utama ke dalam paket APK
           cd bin
           zip -u ZaynixFlexy-unaligned.apk classes.dex
           
+          # Membuat sertifikat tanda tangan keamanan agar bisa dipasang di Android 15
           keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks debug.keystore --ks-pass pass:android --out ZaynixFlexy.apk ZaynixFlexy-unaligned.apk
 
